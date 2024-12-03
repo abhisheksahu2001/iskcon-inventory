@@ -1,5 +1,7 @@
-const express = require('express');
-require('dotenv').config();
+import * as dotenv from "dotenv";
+import express from "express";
+import { turso } from "./db/config.js";
+dotenv.config()
 const app = express();
 
 app.listen(8000 , () => {
