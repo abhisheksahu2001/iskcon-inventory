@@ -1,4 +1,4 @@
-import { turso } from "../db/config"
+import { turso } from "../db/config.js"
 
 class CategoryRepo {
     constructor() {
