@@ -7,4 +7,4 @@ export const turso = createClient({
   authToken: process.env.TURSO_AUTH_TOKEN,
 });
 
-console.log(await turso.execute("Select * FROM users"));
+console.log("hello worl");
