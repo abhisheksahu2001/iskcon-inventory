@@ -1,48 +1,38 @@
-import { turso } from "../db/config.js"
+import { db } from "../db/config.js"
+import { Category } from "./database.js";
+import { eq, sql } from "drizzle-orm";
 
 class CategoryRepo {
     constructor() {
-        this.turso = turso;
+        this.db = db;
     }
 
     async addCategory(name) {
-        return await this.turso.execute(
-            `
-            INSERT INTO Category (name) VALUES (${name});
-        `
-        )
-        
+        let res = await this.db.insert(Category).values({
+            name,
+            createdAt: sql`(datetime('now'))`,
+            updatedAt: sql`(datetime('now'))`,
+        })
+        return res
+
     }
 
     async findCategoryById(id) {
-        return await this.turso.execute(
-            `
-            Select * from Category where id = ${id};
-        `
-        )
+        return await this.db.select().from(Category).where(eq(Category.id, id))
     }
     async findCategoryByName(name) {
-        return await this.turso.execute(
-            `
-            Select * from Category where name = ${name};
-        `
-        )
+        return await this.db.select().from(Category).where(eq(Category.name, name))
+
     }
 
     async deleteCategory(id) {
-        return await this.turso.execute(
-            `
-            Update Category set is_deleted = true where id = ${id};
-        `
-        )
+        return await this.db.delete(Category).where(eq(Category.id, id))
+
     }
 
     async updateCategory(id, name) {
-        return await this.turso.execute(
-            `
-            Update Category set name = ${name} where id = ${id};
-        `
-        )
+        return await this.db.update(Category).set(Category.name, name).where(eq(Category.id, id))
+
     }
 }
 

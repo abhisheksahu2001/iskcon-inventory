@@ -1,122 +1,69 @@
-import { turso } from "../db/config.js";
+import { sql } from 'drizzle-orm';
+import { pgTable, uuid, varchar, boolean, timestamp, integer, decimal, text, date, foreignKey, real } from 'drizzle-orm/pg-core';
+import { sqliteTable } from 'drizzle-orm/sqlite-core';
 
-export async function categoryTable() {
-    try {
-        turso.execute(`
-            CREATE TABLE Category (
-                id UUID PRIMARY KEY,
-                name VARCHAR(50) NOT NULL UNIQUE,
-                is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP 
-            );
-        `).then(()=>{
-            turso.execute(`
-            CREATE TRIGGER IF NOT EXISTS update_category_timestamp
-            AFTER UPDATE ON Category
-            FOR EACH ROW
-            BEGIN
-                UPDATE Category SET updated_at = CURRENT_TIMESTAMP WHERE id = OLD.id;
-            END;
-            `)
-        });
-    } catch (err) {
-        console.log(err);
-    }
-}
 
-export async function measureTable() {
-    try {
-        turso.execute(`
-            CREATE TABLE Measure (
-                id UUID PRIMARY KEY,
-                unit VARCHAR(50) NOT NULL UNIQUE,
-                is_deleted BOOLEAN NOT NULL DEFAULT FALSE
-            );
-        `);
-    } catch (err) {
-        console.log(err);
-    }
-}
 
-export async function productTable() {
-    try {
-        turso.execute(`
-            CREATE TABLE Product (
-                id UUID PRIMARY KEY,
-                name VARCHAR(50) NOT NULL,
-                category_id UUID NOT NULL,
-                price DECIMAL(10, 2) NOT NULL DEFAULT 0,
-                measure_id UUID NOT NULL,
-                product_quantity INT NOT NULL DEFAULT 0,
-                is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-                FOREIGN KEY (category_id) REFERENCES Category(id) ON DELETE SET NULL,
-                FOREIGN KEY (measure_id) REFERENCES Measure(id) ON DELETE SET NULL
-            );
-        `);
-    } catch (err) {
-        console.log(err);
-    }
-}
+// Category Table
+export const Category = sqliteTable('Category', {
+    id: uuid('id').primaryKey().$defaultFn(()=> crypto.randomUUID()),
+    name: varchar('name', { length: 50 }).notNull().unique(),
+    isDeleted: boolean('is_deleted').notNull().default(false),
+    createdAt: text('created_at').default(sql(`(CURRENT_TIMESTAMP)`)),
+    updatedAt: integer('updated_at', { mode: 'timestamp' }).$onUpdate(() => new Date()),
+});
 
-export async function receiptTable() {
-    try {
-        turso.execute(`
-            CREATE TABLE Receipt (
-                id UUID PRIMARY KEY,
-                image BLOB, 
-                is_deleted BOOLEAN NOT NULL DEFAULT FALSE
-            );
-        `);
-    } catch (err) {
-        console.log(err);
-    }
-}
+// Measure Table
+export const Measure = sqliteTable('Measure', {
+    id: text('id').primaryKey(),
+    unit: text('unit', { length: 50 }).notNull().unique(),
+    isDeleted: integer('is_deleted', { mode: 'boolean' }).notNull().default(0)
+});
 
-export async function transactionTable() {
-    try {
-        turso.execute(`
-            CREATE TABLE Transactions (
-                id UUID PRIMARY KEY,
-                receipt_id UUID,
-                transactions_mode VARCHAR(50),
-                transaction_date DATE NOT NULL DEFAULT CURRENT_DATE,
-                product_id UUID,
-                gst DECIMAL(10, 2) DEFAULT 0,
-                product_quantity INT NOT NULL DEFAULT 0,
-                discount DECIMAL(10, 2) DEFAULT 0,
-                amount DECIMAL(10, 2) NOT NULL,
-                note VARCHAR(255),
-                is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-                FOREIGN KEY (product_id) REFERENCES Product(id) ON DELETE SET NULL,
-                FOREIGN KEY (receipt_id) REFERENCES Receipt(id) ON DELETE SET NULL
-            );
-        `)
-    } catch (err) {
-        console.log(err);
-    }
-}
+// Product Table
+export const Product = sqliteTable('Product', {
+    id: text('id').primaryKey(),
+    name: text('name', { length: 50 }).notNull(),
+    categoryId: text('category_id').notNull().references(() => Category.id, { onDelete: 'set null' }),
+    price: real('price').notNull().default(0),
+    measureId: text('measure_id').notNull().references(() => Measure.id, { onDelete: 'set null' }),
+    productQuantity: integer('product_quantity').notNull().default(0),
+    isDeleted: integer('is_deleted', { mode: 'boolean' }).notNull().default(0)
+});
 
-export async function orderTable() {
-    try {
-        turso.execute(`
-            CREATE TABLE Orders (
-                id UUID PRIMARY KEY,
-                name VARCHAR(50) NOT NULL,
-                purpose VARCHAR(50) NOT NULL,
-                order_date DATE NOT NULL DEFAULT CURRENT_DATE,
-                product_id UUID,
-                product_quantity INT NOT NULL DEFAULT 0,
-                description VARCHAR(500),
-                discount DECIMAL(10, 2) DEFAULT 0,
-                amount DECIMAL(10, 2) NOT NULL,
-                receipt_id UUID,
-                is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-                FOREIGN KEY (product_id) REFERENCES Product(id) ON DELETE SET NULL,
-                FOREIGN KEY (receipt_id) REFERENCES Receipt(id) ON DELETE SET NULL
-            );
-        `)
-        } catch (err) {
-        console.log(err);
-    }
-}
+// Receipt Table
+export const Receipt = sqliteTable('Receipt', {
+    id: text('id').primaryKey(),
+    image: text('image'),
+    isDeleted: integer('is_deleted', { mode: 'boolean' }).notNull().default(0)
+});
+
+// Transactions Table
+export const Transactions = sqliteTable('Transactions', {
+    id: text('id').primaryKey(),
+    receiptId: text('receipt_id').references(() => Receipt.id, { onDelete: 'set null' }),
+    transactionsMode: text('transactions_mode', { length: 50 }),
+    transactionDate: text('transaction_date').notNull().default(sql`(CURRENT_DATE)`),
+    productId: text('product_id').references(() => Product.id, { onDelete: 'set null' }),
+    gst: real('gst').default(0),
+    productQuantity: integer('product_quantity').notNull().default(0),
+    discount: real('discount').default(0),
+    amount: real('amount').notNull(),
+    note: text('note', { length: 255 }),
+    isDeleted: integer('is_deleted', { mode: 'boolean' }).notNull().default(0)
+});
+
+// Orders Table
+export const Orders = sqliteTable('Orders', {
+    id: text('id').primaryKey(),
+    name: text('name', { length: 50 }).notNull(),
+    purpose: text('purpose', { length: 50 }).notNull(),
+    orderDate: text('order_date').notNull().default(sql`(CURRENT_DATE)`),
+    productId: text('product_id').references(() => Product.id, { onDelete: 'set null' }),
+    productQuantity: integer('product_quantity').notNull().default(0),
+    description: text('description', { length: 500 }),
+    discount: real('discount').default(0),
+    amount: real('amount').notNull(),
+    receiptId: text('receipt_id').references(() => Receipt.id, { onDelete: 'set null' }),
+    isDeleted: integer('is_deleted', { mode: 'boolean' }).notNull().default(0)
+});

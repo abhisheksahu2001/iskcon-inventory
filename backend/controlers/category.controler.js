@@ -8,8 +8,9 @@ class categoryController {
   async createCategory(req,res){
     try{
       const { name } = await req.body;
+      console.log(name);
       const category = await this.CategoryService.createCategory(name);
-      return req.send({status:200 , data:category });
+      return res.send({status:200 , data:category });
     }catch(error){
       console.log(error);
     }
@@ -18,7 +19,7 @@ class categoryController {
     try{
       const { name } = await req.params;
       const category = await this.CategoryService.getCategoryByName(name);
-      return req.send({status:200 , data:category });
+      return res.send({status:200 , data:category });
     }catch(error){
       console.log(error);
     }

@@ -3,7 +3,7 @@ import express from "express";
 import route from "./api/route.js";
 dotenv.config()
 const app = express();
-
+app.use(express.json());
 app.use('/api', route);
 
 app.listen(8000 , () => {
