@@ -11,7 +11,6 @@ class CategoryRepo {
         let res = await this.db.insert(Category).values({
             name,
             createdAt: sql`(datetime('now'))`,
-            updatedAt: sql`(datetime('now'))`,
         })
         return res
 
@@ -26,7 +25,7 @@ class CategoryRepo {
     }
 
     async deleteCategory(id) {
-        return await this.db.delete(Category).where(eq(Category.id, id))
+        return await this.db.update(Category).set(Category.isDeleted, true).where(eq(Category.id, id))
 
     }
 
