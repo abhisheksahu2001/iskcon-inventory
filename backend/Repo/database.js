@@ -1,6 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { pgTable ,uuid, varchar, boolean, timestamp, integer, decimal, text, date, foreignKey, real } from 'drizzle-orm/pg-core';
 import { sqliteTable } from 'drizzle-orm/sqlite-core';
+import crypto from "crypto";
 
 const generateUUID = () => crypto.randomUUID();
 
