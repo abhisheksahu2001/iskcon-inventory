@@ -20,7 +20,7 @@ class CategoryService {
     }
     async getCategoryByName(name) {
         try {
-            const result = await this.categoryRepo.findCategoryByName(name);
+            const result = await this.categoryRepo.findCategoryByName(name.toLowerCase());
             return result;
         }catch(err){
 

@@ -1,4 +1,4 @@
-import ProductRepo from "../Repo/product";
+import ProductRepo from "../Repo/product.js";
 
 class ProductService {
     constructor() {
@@ -38,9 +38,10 @@ class ProductService {
             return err;
         }
     }
-    async updateProduct(id, name) {
+    async updateProduct(id, payload) {
+        const { name, categoryId, price, measureId, productQuantity } = payload;
         try {
-            const result = await this.productRepo.updateProduct(id,name);
+            const result = await this.productRepo.updateProduct(id,{name, categoryId, price, measureId, productQuantity});
             return result;
         }catch(err){
             console.log(err);

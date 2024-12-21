@@ -26,12 +26,12 @@ class ProductRepo {
     }
 
     async deleteProduct(id) {
-        return await this.db.delete(Product).where(eq(Product.id, id))
+        return await this.db.update(Product).set(Product.isDeleted,true).where(eq(Product.id, id))
 
     }
 
-    async updateProduct(id, name) {
-        return await this.db.update(Product).set(Product.name, name).where(eq(Product.id, id))
+    async updateProduct(id, data) {
+        return await this.db.update(Product).set(Product,data).where(eq(Product.id, id))
 
     }
 }

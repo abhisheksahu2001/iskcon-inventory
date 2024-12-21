@@ -1,4 +1,4 @@
-import ProductService from "../service/product.service";
+import ProductService from "../service/product.service.js";
 class productController {
     constructor() {
     this.productService = new ProductService();
@@ -7,7 +7,6 @@ class productController {
   async createProduct(req,res){
     try{
       const payload= await req.body;
-      console.log(name);
       const category = await this.productService.createProduct(payload);
       return res.send({status:200 , data:category });
     }catch(error){
@@ -35,8 +34,8 @@ class productController {
   async updateProduct(req,res){
     try{
       const { id } = await req.params;
-      const { name } = await req.body;
-      const category = await this.productService.updateProduct(id, name);
+      const payload= await req.body;
+      const category = await this.productService.updateProduct(id, payload);
       return res.send({status:200 , data:category });
     }catch(error){
       console.log(error);
