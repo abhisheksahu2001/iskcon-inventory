@@ -1,5 +1,4 @@
-import CategoryRepo from "../Repo/category.js";
-
+import CategoryRepo from "../Repo/category";
 class CategoryService {
     constructor() {
         this.categoryRepo = new CategoryRepo();
@@ -12,18 +11,18 @@ class CategoryService {
             }
             const result = await this.categoryRepo.addCategory(name.toLowerCase());
             return result;
-        } catch (err) {
+        }
+        catch (err) {
             console.log(err);
             return err;
         }
-
     }
     async getCategoryByName(name) {
         try {
             const result = await this.categoryRepo.findCategoryByName(name.toLowerCase());
             return result;
-        }catch(err){
-
+        }
+        catch (err) {
             console.log(err);
             return err;
         }
@@ -32,30 +31,41 @@ class CategoryService {
         try {
             const result = await this.categoryRepo.findCategoryById(id);
             return result;
-        }catch(err){
+        }
+        catch (err) {
+            console.log(err);
+            return err;
+        }
+    }
+    async getAllCategory() {
+        try {
+            const result = await this.categoryRepo.getAllCategory();
+            return result;
+        }
+        catch (err) {
             console.log(err);
             return err;
         }
     }
     async updateCategory(id, name) {
         try {
-            const result = await this.categoryRepo.updateCategory(id,name);
+            const result = await this.categoryRepo.updateCategory(id, name);
             return result;
-        }catch(err){
+        }
+        catch (err) {
             console.log(err);
             return err;
         }
     }
-
     async deleteCategory(id) {
         try {
             const result = await this.categoryRepo.deleteCategory(id);
             return result;
-        }catch(err){
+        }
+        catch (err) {
             console.log(err);
             return err;
         }
     }
 }
-
-export default CategoryService
+export default CategoryService;

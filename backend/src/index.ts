@@ -1,6 +1,9 @@
 import * as dotenv from "dotenv";
 import express from "express";
-import route from "./api/route.js";
+import route from "./api/route";
+import DatabaseTables from "./Repo";
+
+
 dotenv.config()
 const app = express();
 app.use(express.json());
